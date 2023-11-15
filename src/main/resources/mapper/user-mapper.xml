@@ -10,7 +10,7 @@
     <sql id="insertFields">
         username, password, salt, email, type, status, activation_code, header_url, create_time
     </sql>
-    <insert id="insertUser">
+    <insert id="insertUser" parameterType="user" keyProperty="id">
         insert into user (<include refid="insertFields"/>)
         values (#{username}, #{password}, #{salt}, #{email}, #{type}, #{status}, #{activationCode}, #{headerUrl}, #{createTime})
     </insert>

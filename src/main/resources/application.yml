@@ -11,6 +11,19 @@ spring:
       minimum-idle: 5
       idle-timeout: 30000
 
+#MailProperties
+  mail:
+    port: 465
+    host: smtp.163.com
+    username: xiaoxin000306@163.com
+    password: SOYAJWWVOZXXZVIA
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+
 #配置mybatis
 mybatis:
   type-aliases-package: com.xiaoxin.community.entity
@@ -18,3 +31,11 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
     use-generated-keys: true
+
+#自定义访问路径头
+community:
+  path:
+    domain: http://localhost:8080
+logging:
+  level:
+    com.xiaoxin.community.dao: debug

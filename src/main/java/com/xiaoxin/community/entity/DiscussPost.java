@@ -1,15 +1,11 @@
 package com.xiaoxin.community.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.Date;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @ToString
 public class DiscussPost {
     private int id;

@@ -43,4 +43,9 @@ public class HomeController {
         // 重构后，不需要再返回page对象了。
         return "/index";
     }
+
+    @RequestMapping(path = "/error", method = RequestMethod.GET)
+    public String getErrorPage() {
+        return "/error/500";
+    }
 }

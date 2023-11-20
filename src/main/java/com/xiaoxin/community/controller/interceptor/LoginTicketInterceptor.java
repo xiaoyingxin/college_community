@@ -1,4 +1,4 @@
-package com.xiaoxin.community.interceptor;
+package com.xiaoxin.community.controller.interceptor;
 
 import com.xiaoxin.community.entity.LoginTicket;
 import com.xiaoxin.community.entity.User;

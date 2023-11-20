@@ -1,7 +1,7 @@
 package com.xiaoxin.community.config;
 
-import com.xiaoxin.community.interceptor.LoginRequiredInterceptor;
-import com.xiaoxin.community.interceptor.LoginTicketInterceptor;
+import com.xiaoxin.community.controller.interceptor.LoginRequiredInterceptor;
+import com.xiaoxin.community.controller.interceptor.LoginTicketInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

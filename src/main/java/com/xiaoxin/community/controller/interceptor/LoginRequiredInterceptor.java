@@ -1,4 +1,4 @@
-package com.xiaoxin.community.interceptor;
+package com.xiaoxin.community.controller.interceptor;
 
 import com.xiaoxin.community.annotation.LoginRequired;
 import com.xiaoxin.community.util.HostHolder;

@@ -3,6 +3,9 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!--访问该页面时,在此处生成CSRF令牌.-->
+	<!--	<meta name="_csrf" th:content="${_csrf.token}">-->
+	<!--	<meta name="_csrf_header" th:content="${_csrf.headerName}">-->
 	<link rel="icon" href="https://static.nowcoder.com/images/logo_87_87.png"/>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
 	<link rel="stylesheet" th:href="@{/css/global.css}" />
@@ -131,9 +134,9 @@
 							<div class="text-muted font-size-12">
 								<u class="mr-3" th:utext="${map.user.username}">寒江雪</u> 发布于 <b th:text="${#dates.format(map.post.createTime,'yyyy-MM-dd HH:mm:ss')}">2019-04-15 15:32:18</b>
 								<ul class="d-inline float-right">
-<!--									<li class="d-inline ml-2">赞 <span th:text="${map.likeCount}">11</span></li>-->
-<!--									<li class="d-inline ml-2">|</li>-->
-<!--									<li class="d-inline ml-2">回帖 <span th:text="${map.post.commentCount}">7</span></li>-->
+									<li class="d-inline ml-2">赞 <span th:text="${map.likeCount}">11</span></li>
+									<li class="d-inline ml-2">|</li>
+									<li class="d-inline ml-2">回帖 <span th:text="${map.post.commentCount}">7</span></li>
 								</ul>
 							</div>
 						</div>						

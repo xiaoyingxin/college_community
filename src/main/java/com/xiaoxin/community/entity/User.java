@@ -7,7 +7,7 @@ import java.util.Date;
 @Data
 @ToString
 public class User {
-private int id;
+    private int id;
     private String username;
     private String password;
     private String salt;

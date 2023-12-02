@@ -1,7 +1,9 @@
 package com.xiaoxin.community.util;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
 public class CookieUtil {
     public static String getValue(HttpServletRequest request, String name){
         if (request == null || name == null){

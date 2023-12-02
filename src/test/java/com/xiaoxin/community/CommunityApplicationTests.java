@@ -2,7 +2,7 @@ package com.xiaoxin.community;
 
 import com.xiaoxin.community.dao.AlphaDAO;
 import com.xiaoxin.community.service.AlphaService;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

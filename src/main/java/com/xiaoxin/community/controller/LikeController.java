@@ -7,6 +7,7 @@ import com.xiaoxin.community.service.LikeService;
 import com.xiaoxin.community.util.CommunityConstant;
 import com.xiaoxin.community.util.CommunityUtil;
 import com.xiaoxin.community.util.HostHolder;
+import com.xiaoxin.community.util.RedisKeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -57,6 +58,12 @@ public class LikeController implements CommunityConstant {
                     .setUserId(user.getId())
                     .setData("postId", postId);
             eventProducer.fireEvent(event);
+        }
+
+        if (entityType == ENTITY_TYPE_POST){
+            //计算帖子分数
+            String redisKey = RedisKeyUtil.getPostScoreKey();
+            redisTemplate.opsForSet().add(redisKey,postId);
         }
 
         return CommunityUtil.getJSONString(0,null,map);

@@ -7,6 +7,8 @@ import com.xiaoxin.community.entity.User;
 import com.xiaoxin.community.util.CommunityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -63,4 +65,16 @@ public class AlphaService {
         Integer.valueOf("abc");
         return "ok";
     }
+
+    //让该方法在多线程环境下被异步的调用
+    @Async
+    public void execute1(){
+        System.out.println("execute1");
+    }
+
+    //@Scheduled(initialDelay = 10000, fixedRate = 1000)
+    public void execute2(){
+        System.out.println("execute2");
+    }
+
 }

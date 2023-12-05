@@ -11,7 +11,7 @@ spring:
       minimum-idle: 5
       idle-timeout: 30000
 
-#MailProperties
+  #MailProperties
   mail:
     port: 465
     host: smtp.163.com
@@ -39,7 +39,26 @@ spring:
     host: 8.130.109.134
     port: 6379
     database: 11
+  #TaskSchedulerProperties
+  task:
+    scheduling:
+      pool:
+        size: 5
 
+#QuartzProperties
+  quartz:
+    job-store-type: jdbc
+    scheduler-name: communityScheduler
+    scheduler-instance-id: AUTO
+    properties:
+      org.quartz:
+        jobStore:
+          class: org.quartz.impl.jdbcjobstore.JobStoreTX
+          driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+          isClustered: true
+        threadPool:
+          class: org.quartz.simpl.SimpleThreadPool
+          threadCount: 5
 #配置mybatis
 mybatis:
   type-aliases-package: com.xiaoxin.community.entity
@@ -55,4 +74,35 @@ community:
 logging:
   level:
     com.xiaoxin.community.dao: debug
+    com.xiaoxin.community: debug
 
+# wk
+wk.image:
+  storage: D:/work/data/wk-images
+  command: D:/work/wkhtmltopdf/bin/wkhtmltoimage
+
+# qiniu
+qiniu:
+  key:
+    access: J0rmCK3z-fhyyACFcuxMKUng9_TFHJlzklnY2k9N
+    secret: KMC9zZbMq5qJ-J3A_Nr4uxCHAbsvhXz-qV6EwCxt
+  bucket:
+    header:
+      name: xiaoxin-community-header1
+      url: http://s4zj2bniy.hb-bkt.clouddn.com
+    share:
+      name: xiaoxin-community-share
+      url: http://s3n2ovbaw.hb-bkt.clouddn.com
+# caffeine
+caffeine:
+  posts:
+    max-size: 15
+    expire-seconds: 180
+
+# actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+        exclude: info, cache

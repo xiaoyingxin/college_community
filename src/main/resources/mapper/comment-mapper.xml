@@ -38,4 +38,35 @@
         from comment
         where id = #{id}
     </select>
+    <select id="selectUserCommentCount" resultType="java.lang.Integer">
+        SELECT COUNT(id)
+        FROM (
+        SELECT
+        <include refid="selectFields"></include>,
+        ROW_NUMBER() OVER (PARTITION BY entity_id ORDER BY create_time DESC) AS row_num
+        FROM comment
+        WHERE user_id = #{userId}
+        AND entity_type = 1
+        AND status = 0
+        ) AS c
+        WHERE c.row_num = 1
+    </select>
+    <select id="selectUserComments" resultType="com.xiaoxin.community.entity.Comment">
+
+        SELECT
+        <include refid="selectFields"></include>
+        FROM (
+            SELECT
+                <include refid="selectFields"></include>,
+                ROW_NUMBER() OVER (PARTITION BY entity_id ORDER BY create_time DESC) AS row_num
+            FROM comment
+            WHERE user_id = #{userId}
+              AND entity_type = 1
+              AND status = 0
+        ) AS c
+        WHERE c.row_num = 1
+        ORDER BY c.create_time DESC
+        LIMIT #{offset}, #{limit}
+
+    </select>
 </mapper>

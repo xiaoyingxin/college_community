@@ -21,9 +21,9 @@ body {
 }
 
 header .navbar-brand {
-	background: url('http://static.nowcoder.com/images/res/logo/logo-v3.png') no-repeat;
-	background-size: 147px 42px;
-	width: 147px;
+	background: transparent url('http://s56g8w8i9.hb-bkt.clouddn.com/campuslogo') no-repeat;
+	background-size: 100px 42px;
+	width: 100px;
 	height: 42px;
 	margin: 5px 15px 5px 0;
 }

@@ -47,4 +47,12 @@ public class CommentService {
         }
         return rows;
     }
+
+    public int findUserCommentCount(int userId) {
+        return commentMapper.selectUserCommentCount(userId);
+    }
+
+    public List<Comment> findUserComments(int userId, int offset, int limit) {
+        return commentMapper.selectUserComments(userId, offset, limit);
+    }
 }

@@ -3,18 +3,18 @@ package com.xiaoxin.community.controller;
 import com.qiniu.util.Auth;
 import com.qiniu.util.StringMap;
 import com.xiaoxin.community.annotation.LoginRequired;
+import com.xiaoxin.community.entity.Comment;
+import com.xiaoxin.community.entity.DiscussPost;
+import com.xiaoxin.community.entity.Page;
 import com.xiaoxin.community.entity.User;
-import com.xiaoxin.community.service.FollowService;
-import com.xiaoxin.community.service.LikeService;
-import com.xiaoxin.community.service.UserService;
-import com.xiaoxin.community.util.CommunityConstant;
-import com.xiaoxin.community.util.CommunityUtil;
-import com.xiaoxin.community.util.HostHolder;
+import com.xiaoxin.community.service.*;
+import com.xiaoxin.community.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,13 +22,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequestMapping("/user")
@@ -46,6 +52,21 @@ public class UserController implements CommunityConstant {
 
     @Autowired
     private FollowService followService;
+
+    @Autowired
+    private CommentService commentService;
+
+    @Autowired
+    private DiscussPostService discussPostService;
+
+    @Autowired
+    private MailClient mailClient;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private TemplateEngine templateEngine;
 
     @Value("${community.path.upload}")
     private String uploadPath;
@@ -203,4 +224,113 @@ public class UserController implements CommunityConstant {
         return "/site/profile";
     }
 
+    //回复的帖子
+    @RequestMapping(path = "/my-reply/{userId}",method = RequestMethod.GET)
+    public String getMyReplyPage(@PathVariable("userId") int userId, Model model, Page page){
+        User user = userService.findUserById(userId);
+        if (user == null){
+            throw new RuntimeException("该用户不存在！");
+        }
+        //用户
+        model.addAttribute("user",user);
+        //回复数量
+        int commentCount = commentService.findUserCommentCount(userId);
+        model.addAttribute("commentCount",commentCount);
+        //分页信息
+        page.setLimit(5);
+        page.setPath("/user/my-reply/" + userId);
+        page.setRows(commentCount);
+        //回复列表
+        List<Comment> commentList = commentService.findUserComments(userId,page.getOffset(),page.getLimit());
+        //回复VO列表
+        List<Map<String, Object>> commentVoList = new ArrayList<>();
+        if (commentList != null){
+            for (Comment comment : commentList) {
+                //评论VO
+                Map<String, Object> commentVo = new HashMap<>();
+                //评论
+                commentVo.put("comment", comment);
+                //帖子
+                DiscussPost post = discussPostService.findDiscussPostById(comment.getEntityId());
+                commentVo.put("post",post);
+                commentVoList.add(commentVo);
+            }
+        }
+        model.addAttribute("comments",commentVoList);
+        return "/site/my-reply";
+    }
+
+    //我的帖子
+    @RequestMapping(path = "/my-post/{userId}",method = RequestMethod.GET)
+    public String getMyPostPage(@PathVariable("userId") int userId, Model model, Page page){
+        User user = userService.findUserById(userId);
+        if (user == null){
+            throw new RuntimeException("该用户不存在！");
+        }
+        //用户
+        model.addAttribute("user",user);
+        //帖子数量
+        int postCount = discussPostService.findDiscussPostRows(userId);
+        model.addAttribute("postCount",postCount);
+        //分页信息
+        page.setLimit(5);
+        page.setPath("/user/my-post/" + userId);
+        page.setRows(postCount);
+        //帖子列表
+        List<DiscussPost> postList = discussPostService.findDiscussPosts(userId,page.getOffset(),page.getLimit(),0);
+        //帖子VO列表
+        List<Map<String, Object>> postVoList = new ArrayList<>();
+        if (postList != null){
+            for (DiscussPost post : postList) {
+                //帖子VO
+                Map<String, Object> postVo = new HashMap<>();
+                //帖子
+                postVo.put("post", post);
+                //点赞数量
+                long likeCount = likeService.findEntityLikeCount(ENTITY_TYPE_POST, post.getId());
+                postVo.put("likeCount",likeCount);
+                postVoList.add(postVo);
+            }
+        }
+        model.addAttribute("posts",postVoList);
+        return "/site/my-post";
+    }
+
+    //忘记密码
+    @RequestMapping(path = "/forget",method = RequestMethod.GET)
+    public String getForgetPage(){
+        return "/site/forget";
+    }
+
+    //发送验证码
+    @RequestMapping(path = "/forget/code",method = RequestMethod.GET)
+    @ResponseBody
+    public String getForgetCode(String email){
+        //生成验证码
+        String code = CommunityUtil.generateUUID().substring(0,6);
+        //验证码存入redis
+        String redisKey = RedisKeyUtil.getCodeKey(email);
+        redisTemplate.opsForValue().set(redisKey,code,60*5, TimeUnit.SECONDS);
+        //发送邮件
+        Context context = new Context();
+        context.setVariable("email",email);
+        context.setVariable("code",code);
+        String content = templateEngine.process("/mail/forget", context);
+        mailClient.sendMail(email,"忘记密码",content);
+        return CommunityUtil.getJSONString(0,"验证码已发送！");
+    }
+
+    //重置密码
+    @RequestMapping(path = "/forget/reset",method = RequestMethod.POST)
+    public String resetPassword(String email,String code,String newPassword,Model model){
+        Map<String, Object> map = userService.resetPassword(email,code, newPassword);
+        if (map == null || map.isEmpty()){
+            return "redirect:/login";
+        }else {
+            model.addAttribute("emailMsg",map.get("emailMsg"));
+            model.addAttribute("codeMsg",map.get("codeMsg"));
+            model.addAttribute("newPasswordMsg",map.get("newPasswordMsg"));
+            return "/site/forget";
+        }
+    }
 }

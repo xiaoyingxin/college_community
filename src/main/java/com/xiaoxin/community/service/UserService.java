@@ -264,4 +264,34 @@ public class UserService implements CommunityConstant {
         );
         return list;
     }
+
+    //重置密码
+    public Map<String, Object> resetPassword(String email, String code, String newPassword) {
+        Map<String, Object> map = new HashMap<>();
+        if (StringUtils.isBlank(code)){
+            map.put("codeMsg","验证码不能为空!");
+            return map;
+        }
+        if (StringUtils.isBlank(newPassword)){
+            map.put("newPasswordMsg","新密码不能为空!");
+            return map;
+        }
+
+        //验证验证码
+        String redisKey = RedisKeyUtil.getCodeKey(email);
+        String codeKey = (String) redisTemplate.opsForValue().get(redisKey);
+        if (StringUtils.isBlank(codeKey)){
+            map.put("codeMsg","验证码已过期!");
+            return map;
+        }
+        if (!codeKey.equals(code)){
+            map.put("codeMsg","验证码不正确!");
+            return map;
+        }
+        //更新密码
+        User user = userMapper.selectByEmail(email);
+        userMapper.updatePassword(user.getId(),CommunityUtil.md5(newPassword+user.getSalt()));
+        clearCache(user.getId());
+        return map;
+    }
 }
